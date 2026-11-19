@@ -1,0 +1,206 @@
+<title>So zählt der LEGO-Scanner</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;800&family=Nunito:wght@400;600;700&display=swap">
+<style>
+/* Layout: eine Spalte wie ein Bauplan-Heft; Schritte als nummerierte Bauschritte, Diagramm als Bauanleitung */
+:root{
+  --bg:#f6f7f9; --paper:#ffffff; --ink:#1d2330; --muted:#5a6475; --line:#d9dee7;
+  --red:#d01012; --yellow:#f5c400; --blue:#0b5cad; --green:#1f7a3a;
+  --red-soft:#fde7e7; --blue-soft:#e6f0fb; --yellow-soft:#fff6d1; --green-soft:#e4f4e9;
+  --display:"Baloo 2", "Trebuchet MS", system-ui, sans-serif;
+  --body:"Nunito", "Segoe UI", system-ui, sans-serif;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#12151b; --paper:#1b2029; --ink:#e9edf3; --muted:#a3adbd; --line:#2e3542;
+  --red:#ff5a5c; --yellow:#ffd84d; --blue:#5aa7ff; --green:#4cc678;
+  --red-soft:#3a1d20; --blue-soft:#17283d; --yellow-soft:#3a3315; --green-soft:#17301f; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#12151b; --paper:#1b2029; --ink:#e9edf3; --muted:#a3adbd; --line:#2e3542;
+  --red:#ff5a5c; --yellow:#ffd84d; --blue:#5aa7ff; --green:#4cc678;
+  --red-soft:#3a1d20; --blue-soft:#17283d; --yellow-soft:#3a3315; --green-soft:#17301f; color-scheme:dark}
+body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:17px;line-height:1.6;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:32px 64px}
+.wrap{max-width:760px;margin:0 auto;display:flex;flex-direction:column;gap:40px}
+h1,h2,h3{font-family:var(--display);line-height:1.15;text-wrap:balance;margin:0}
+h1{font-size:2.4rem;font-weight:800}
+h2{font-size:1.7rem;font-weight:800;display:flex;align-items:center;gap:12px}
+h3{font-size:1.15rem;font-weight:600}
+p{margin:0}
+.lead{color:var(--muted);font-size:1.1rem;max-width:62ch}
+.part-tag{font-family:var(--display);font-size:.8rem;letter-spacing:.08em;text-transform:uppercase;
+  background:var(--yellow);color:#1d2330;padding:2px 10px;border-radius:6px}
+section{display:flex;flex-direction:column;gap:18px}
+.studs{display:inline-grid;grid-template-columns:repeat(4,10px);gap:4px;padding:6px;border-radius:4px;background:var(--red)}
+.studs i{width:10px;height:10px;border-radius:50%;background:rgba(255,255,255,.35);box-shadow:inset 0 -2px 0 rgba(0,0,0,.18)}
+.idea{background:var(--paper);border:1px solid var(--line);border-radius:10px;padding:18px 20px;display:flex;flex-direction:column;gap:8px}
+.diagram{background:var(--paper);border:1px solid var(--line);border-radius:12px;padding:20px;overflow-x:auto}
+.diagram svg{display:block;width:100%;min-width:560px;height:auto}
+.diagram text{font-family:var(--body);fill:var(--ink)}
+.diagram .small{font-size:12px;fill:var(--muted)}
+.steps{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:14px;counter-reset:s}
+.steps li{display:grid;grid-template-columns:40px 1fr;gap:14px;align-items:start}
+.steps li::before{counter-increment:s;content:counter(s);font-family:var(--display);font-weight:800;font-size:1.1rem;
+  width:36px;height:36px;border-radius:8px;display:grid;place-items:center;background:var(--blue-soft);color:var(--blue)}
+.steps b{display:block}
+.steps span{color:var(--muted)}
+.studdemo{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px}
+.studdemo .idea svg{width:100%;max-width:220px;height:auto}
+.probs{list-style:none;margin:0;padding:0;display:grid;gap:12px}
+.probs li{background:var(--paper);border:1px solid var(--line);border-radius:10px;padding:14px 18px;display:grid;gap:4px}
+.probs b{font-family:var(--display);font-weight:600;font-size:1.05rem}
+.probs span{color:var(--muted)}
+.sev{justify-self:start;font-size:.75rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;padding:1px 8px;border-radius:999px}
+.sev.big{background:var(--red-soft);color:var(--red)}
+.sev.mid{background:var(--yellow-soft);color:var(--ink)}
+.foot{color:var(--muted);font-size:.9rem;border-top:1px solid var(--line);padding-top:14px}
+@media (max-width:480px){h1{font-size:1.9rem}}
+</style>
+
+<div class="wrap">
+  <header style="display:flex;flex-direction:column;gap:14px">
+    <div class="studs" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+    <h1>So zählt der LEGO-Scanner</h1>
+    <p class="lead">Du fotografierst deine LEGO-Teile, und das Programm sagt dir, wie viele Teile welche Farbe haben und wie viele Noppen sie haben. Hier steht, wie das in der aktuellen Version funktioniert. Das Programm benutzt keine KI. Es befolgt einfache feste Regeln, ein bisschen wie ein Roboter mit einer Checkliste.</p>
+  </header>
+
+  <section>
+    <h2><span class="part-tag">Teil 1</span> Wie es funktioniert</h2>
+
+    <div class="idea">
+      <h3>Die Grundidee in einem Satz</h3>
+      <p>Der Tisch hat eine Farbe, LEGO hat andere Farben. Alles, was nicht wie der Tisch aussieht, ist vermutlich ein LEGO-Teil. Auf jedem Teil sucht das Programm dann nach kleinen runden Hügeln, den Noppen.</p>
+    </div>
+
+    <div class="diagram" role="img" aria-label="Ablaufdiagramm: vom Foto bis zur Tabelle mit Farbe und Noppenzahl">
+      <svg viewBox="0 0 640 1010" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+            <path d="M0,0 L10,5 L0,10 z" fill="var(--muted)"/>
+          </marker>
+        </defs>
+        <g stroke="var(--muted)" stroke-width="2" fill="none" marker-end="url(#arr)">
+          <path d="M320 70 V98"/><path d="M320 158 V186"/><path d="M320 246 V274"/><path d="M320 334 V362"/>
+          <path d="M320 422 V450"/><path d="M320 510 V538"/><path d="M320 598 V626"/>
+          <path d="M240 676 H150 V728"/><path d="M400 676 H490 V728"/>
+          <path d="M150 788 V840 H290"/><path d="M490 788 V840 H350"/>
+          <path d="M320 870 V908"/>
+        </g>
+        <!-- Kästen -->
+        <g stroke-width="2">
+          <rect x="170" y="10" width="300" height="60" rx="10" fill="var(--yellow-soft)" stroke="var(--yellow)"/>
+          <rect x="170" y="100" width="300" height="58" rx="10" fill="var(--yellow-soft)" stroke="var(--yellow)"/>
+          <rect x="170" y="188" width="300" height="58" rx="10" fill="var(--paper)" stroke="var(--line)"/>
+          <rect x="170" y="276" width="300" height="58" rx="10" fill="var(--paper)" stroke="var(--line)"/>
+          <rect x="170" y="364" width="300" height="58" rx="10" fill="var(--paper)" stroke="var(--line)"/>
+          <rect x="170" y="452" width="300" height="58" rx="10" fill="var(--paper)" stroke="var(--line)"/>
+          <rect x="170" y="540" width="300" height="58" rx="10" fill="var(--blue-soft)" stroke="var(--blue)"/>
+          <polygon points="320,628 400,676 320,724 240,676" fill="var(--blue-soft)" stroke="var(--blue)"/>
+          <rect x="40" y="730" width="220" height="58" rx="10" fill="var(--green-soft)" stroke="var(--green)"/>
+          <rect x="380" y="730" width="220" height="58" rx="10" fill="var(--red-soft)" stroke="var(--red)"/>
+          <rect x="170" y="812" width="300" height="58" rx="10" fill="var(--yellow-soft)" stroke="var(--yellow)"/>
+          <rect x="170" y="910" width="300" height="70" rx="10" fill="var(--green-soft)" stroke="var(--green)"/>
+        </g>
+        <!-- Texte -->
+        <g text-anchor="middle" font-size="15" font-weight="700">
+          <text x="320" y="36">📷 Foto von oben</text>
+          <text x="320" y="124">Gelben Rahmen ziehen</text>
+          <text x="320" y="212">Tischfarbe finden</text>
+          <text x="320" y="300">Jeden Bildpunkt prüfen</text>
+          <text x="320" y="388">Punkte zu Flecken verbinden</text>
+          <text x="320" y="476">Farbe bestimmen</text>
+          <text x="320" y="564">Noppen-Gitter ausprobieren</text>
+          <text x="320" y="672">sicher</text>
+          <text x="320" y="688">genug?</text>
+          <text x="150" y="754">Ja: z. B. 2 × 4</text>
+          <text x="490" y="754">Nein: „Nicht sicher“</text>
+          <text x="320" y="836">Du prüfst und korrigierst</text>
+          <text x="320" y="938">Tabelle: Farbe · Noppen · Anzahl</text>
+        </g>
+        <g text-anchor="middle" class="small">
+          <text class="small" x="320" y="56">Weitere Fotos nur zum Anschauen</text>
+          <text class="small" x="320" y="144">Nur hier drin wird gesucht</text>
+          <text class="small" x="320" y="232">Die häufigste Farbe ist der Tisch</text>
+          <text class="small" x="320" y="320">Anders als der Tisch? Dann ist es LEGO</text>
+          <text class="small" x="320" y="408">Ein Fleck = ein Teil, zu klein/groß fliegt raus</text>
+          <text class="small" x="320" y="496">Mittlere Farbe → einer von 8 Namen</text>
+          <text class="small" x="320" y="584">1×1 bis 6×10 testen, das beste gewinnt</text>
+          <text class="small" x="150" y="774">Zeilen × Spalten = 8 Noppen</text>
+          <text class="small" x="490" y="774">Teil zählt trotzdem mit</text>
+          <text class="small" x="320" y="856">Radierer weg, blauer Rahmen dazu</text>
+          <text class="small" x="320" y="958">gleiche Farbe + gleiche Noppen</text>
+          <text class="small" x="320" y="972">kommen in eine Zeile</text>
+        </g>
+      </svg>
+    </div>
+
+    <ol class="steps">
+      <li><div><b>Foto machen</b><span>Am besten genau von oben, auf einem hellen Tisch, mit Abstand zwischen den Teilen. Gerechnet wird nur mit Foto 1. Weitere Fotos (z. B. von der Seite) kannst du dir nur anschauen.</span></div></li>
+      <li><div><b>Gelben Rahmen ziehen</b><span>Damit sagst du: „Such nur hier.“ Alles außerhalb wird ignoriert, zum Beispiel der Fußboden.</span></div></li>
+      <li><div><b>Tischfarbe finden</b><span>Das Programm schaut, welche Farbe im Rahmen am häufigsten vorkommt. Das muss der Tisch sein.</span></div></li>
+      <li><div><b>Jeden Bildpunkt prüfen</b><span>Für jeden winzigen Punkt fragt es: Ist er bunter, heller, dunkler oder anders gefärbt als der Tisch? Wenn ja, gehört er wahrscheinlich zu einem LEGO-Teil.</span></div></li>
+      <li><div><b>Punkte zu Flecken verbinden</b><span>Nebeneinander liegende LEGO-Punkte werden zu einem Fleck zusammengeklebt. Jeder Fleck gilt als ein Teil. Um den Fleck kommt ein grüner Rahmen, der sich mitdreht, wenn das Teil schräg liegt. Sehr kleine Flecken (Krümel) und sehr große Flecken werden weggeworfen.</span></div></li>
+      <li><div><b>Farbe bestimmen</b><span>Es mischt alle Farben im Fleck zu einer Durchschnittsfarbe und ordnet sie einem von 8 Namen zu: Rot, Grün, Beige, Gelb, Blau, Grau, Braun, Schwarz.</span></div></li>
+      <li><div><b>Noppen zählen</b><span>Das Programm legt verschiedene Gitter über das Teil (siehe unten) und schaut, welches am besten passt.</span></div></li>
+      <li><div><b>Du hilfst mit</b><span>Falsche grüne Rahmen radierst du weg, vergessene Teile umrahmst du blau.</span></div></li>
+      <li><div><b>Tabelle</b><span>Teile mit gleicher Farbe und gleicher Noppenzahl kommen in eine Zeile und werden gezählt.</span></div></li>
+    </ol>
+
+    <div class="idea">
+      <h3>Wie kommt das Programm auf die Noppenzahl?</h3>
+      <p>Eine Noppe sieht auf dem Foto aus wie ein kleiner Kreis: Die Mitte ist etwas heller oder dunkler als der Ring drumherum. Das Programm macht deshalb ein Ratespiel:</p>
+    </div>
+    <div class="studdemo">
+      <div class="idea">
+        <b>1. Gitter ausprobieren</b>
+        <svg viewBox="0 0 200 110" aria-hidden="true">
+          <rect x="10" y="10" width="180" height="90" rx="6" fill="var(--red)"/>
+          <g fill="rgba(255,255,255,.35)">
+            <circle cx="32" cy="32" r="12"/><circle cx="77" cy="32" r="12"/><circle cx="122" cy="32" r="12"/><circle cx="167" cy="32" r="12"/>
+            <circle cx="32" cy="78" r="12"/><circle cx="77" cy="78" r="12"/><circle cx="122" cy="78" r="12"/><circle cx="167" cy="78" r="12"/>
+          </g>
+          <g stroke="var(--ink)" stroke-width="1.5" stroke-dasharray="4 3" fill="none">
+            <line x1="100" y1="10" x2="100" y2="100"/><line x1="10" y1="55" x2="190" y2="55"/>
+          </g>
+        </svg>
+        <span style="color:var(--muted)">Ein 2 × 2-Gitter: Die Kästchenmitten treffen keine Noppen. Das passt schlecht.</span>
+      </div>
+      <div class="idea">
+        <b>2. Bestes Gitter gewinnt</b>
+        <svg viewBox="0 0 200 110" aria-hidden="true">
+          <rect x="10" y="10" width="180" height="90" rx="6" fill="var(--red)"/>
+          <g fill="rgba(255,255,255,.35)">
+            <circle cx="32" cy="32" r="12"/><circle cx="77" cy="32" r="12"/><circle cx="122" cy="32" r="12"/><circle cx="167" cy="32" r="12"/>
+            <circle cx="32" cy="78" r="12"/><circle cx="77" cy="78" r="12"/><circle cx="122" cy="78" r="12"/><circle cx="167" cy="78" r="12"/>
+          </g>
+          <g stroke="var(--ink)" stroke-width="1.5" stroke-dasharray="4 3" fill="none">
+            <line x1="55" y1="10" x2="55" y2="100"/><line x1="100" y1="10" x2="100" y2="100"/><line x1="145" y1="10" x2="145" y2="100"/><line x1="10" y1="55" x2="190" y2="55"/>
+          </g>
+          <g fill="var(--yellow)"><circle cx="32" cy="32" r="3"/><circle cx="77" cy="32" r="3"/><circle cx="122" cy="32" r="3"/><circle cx="167" cy="32" r="3"/><circle cx="32" cy="78" r="3"/><circle cx="77" cy="78" r="3"/><circle cx="122" cy="78" r="3"/><circle cx="167" cy="78" r="3"/></g>
+        </svg>
+        <span style="color:var(--muted)">2 × 4: In jedem Kästchen sitzt ein Kreis. Das ergibt 8 Noppen.</span>
+      </div>
+      <div class="idea">
+        <b>3. Sicher genug?</b>
+        <span style="color:var(--muted)">Passen zu wenige Kästchen, steht in der Tabelle „Nicht sicher“. Bei einem 1 × 1 ist das Programm besonders streng. Gibt es auf einem anderen Foto ein Teil gleicher Farbe und Form mit besserer Schätzung, übernimmt es diese Zahl.</span>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <h2><span class="part-tag">Teil 2</span> Wo es heute hakt</h2>
+    <ul class="probs">
+      <li><span class="sev big">Großes Problem</span><b>Das Foto wird stark verkleinert</b><span>Fürs Suchen schrumpft das Programm das Foto auf 240 × 180 Punkte, fürs Noppenzählen auf 960 × 720. Ein 2 × 4-Stein ist dann nur noch etwa 6 × 10 Punkte groß. Viele Details gehen verloren.</span></li>
+      <li><span class="sev big">Großes Problem</span><b>Teile, die sich berühren, werden zu einem Teil</b><span>Zwei Steine nebeneinander bilden einen Fleck. Dann stimmen Anzahl, Farbe und Noppen nicht mehr.</span></li>
+      <li><span class="sev big">Großes Problem</span><b>Nur 8 Farbnamen</b><span>Weiß, Türkis, Dunkelrot, Hell- und Dunkelgrau gibt es nicht. Türkis wird zu Blau, Dunkelrot zu Rot oder Braun. Ein weißes Teil auf einem weißen Tisch sieht das Programm kaum.</span></li>
+      <li><span class="sev big">Großes Problem</span><b>Stein oder Platte? Weiß es nicht</b><span>Ein Stein ist dreimal so hoch wie eine Platte. Das sieht man nur von der Seite, aber das Seitenfoto wird nicht ausgewertet.</span></li>
+      <li><span class="sev mid">Mittel</span><b>Licht und Schatten verfälschen alles</b><span>Ein Schatten macht Teile dunkler, Glanz macht sie heller. Ein Schatten auf dem Tisch kann sogar selbst als Teil erkannt werden.</span></li>
+      <li><span class="sev mid">Mittel</span><b>Schräge Fotos stören</b><span>Fotografiert man nicht genau von oben, gehören die Seitenwände des Steins mit zum Fleck. Der Rahmen wird zu groß und das Noppen-Gitter passt nicht mehr.</span></li>
+      <li><span class="sev mid">Mittel</span><b>Noppen auf dunklen und hellen Teilen</b><span>Auf schwarzen, weißen und beigen Teilen sind die kleinen Kreise kaum zu sehen. Dann rät das Programm oder sagt „Nicht sicher“.</span></li>
+      <li><span class="sev mid">Mittel</span><b>Feste Regeln für alle Fälle</b><span>Die Grenzen („wie anders muss ein Punkt sein?“, „wie groß darf ein Teil sein?“) sind fest eingestellt. Anderes Licht, ein anderer Tisch oder ein näheres Foto, und schon passen sie nicht mehr. Große Teile auf Nahaufnahmen können zum Beispiel einfach verschwinden.</span></li>
+      <li><span class="sev mid">Mittel</span><b>Nur rechteckige Standardteile</b><span>Dachsteine, runde Teile, Fliesen ohne Noppen oder Technic-Teile kennt das Programm nicht.</span></li>
+      <li><span class="sev mid">Mittel</span><b>Es lernt nichts dazu</b><span>Wenn du korrigierst, merkt sich das Programm das nicht für das nächste Foto.</span></li>
+    </ul>
+  </section>
+
+  <p class="foot">Stand: aktuelle Version in lego-plans-kamera.html, November 2026.</p>
+</div>
